@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Anonymous Browser</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        #controls {
+            display: flex;
+            padding: 5px;
+            background-color: #111;
+            border-bottom: 1px solid #333;
+        }
+
+        #url {
+            flex: 1;
+            margin-right: 5px;
+            height: 18px;
+            padding: 5px;
+            border: 1px solid #333;
+            background-color: #000;
+            color: #00ff00;
+        }
+
+        #browser {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background-color: #000;
+        }
+
+        button {
+            height: 30px;
+            padding: 0 10px;
+            border: 1px solid #333;
+            background-color: #000;
+            color: #00ff00;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        button:hover {
+            background-color: #222;
+        }
+
+        .spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 50px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .notification {
+            position: absolute;
+            font-size: 14px;
+            top: 2.7rem;
+            right: 0.20rem;
+            background-color: #111;
+            color: #00ff00;
+            padding: 7px;
+            border: 1px solid #333;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <button id="back">Back</button>
+        <button id="forward">Forward</button>
+        <input type="text" id="url" placeholder="Enter URL" />
+        <button id="go">Go</button>
+    </div>
+    <div id="spinner" class="spinner"></div>
+    <div id="notification" class="notification">Tor circuit changed</div>
+    <iframe id="browser" src="about:blank"></iframe>
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        window.onload = () => {
+            const browser = document.getElementById('browser');
+            const urlInput = document.getElementById('url');
+            const goButton = document.getElementById('go');
+            const backButton = document.getElementById('back');
+            const forwardButton = document.getElementById('forward');
+            const spinner = document.getElementById('spinner');
+            const notification = document.getElementById('notification');
+
+            const showSpinner = () => { spinner.style.display = 'block'; };
+            const hideSpinner = () => { spinner.style.display = 'none'; };
+
+            const showNotification = (message) => {
+                notification.innerText = message;
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            };
+
+            goButton.addEventListener('click', () => {
+                const url = urlInput.value;
+                if (url) {
+                    const fullUrl = url.startsWith('http') ? url : `http://${url}`;
+                    showSpinner();
+                    browser.src = fullUrl;
+                }
+            });
+
+            backButton.addEventListener('click', () => {
+                browser.contentWindow.history.back();
+            });
+
+            forwardButton.addEventListener('click', () => {
+                browser.contentWindow.history.forward();
+            });
+
+            browser.addEventListener('load', hideSpinner);
+
+            // Load initial page
+            showSpinner();
+            browser.src = 'https://check.torproject.org';
+
+            // Listen for Tor circuit change event
+            ipcRenderer.on('tor-circuit-changed', () => {
+                showNotification('Tor circuit changed');
+            });
+        };
+    </script>
+</body>
+
+</html>
