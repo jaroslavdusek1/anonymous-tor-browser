@@ -50,11 +50,13 @@ The Anonymous TOR Browser is a privacy-focused web browser designed to route all
     Replace 16:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX with the hashed password you generated. Save this content into a file named torrc in the project directory
 
 7. Update the Python script change_circuit.py with your chosen password:
+    ```plaintext
     def change_tor_circuit():
     with Controller.from_port(port=9051) as controller:
         controller.authenticate(password='[YOUR_PASSWORD_NAME]')
         controller.signal(Signal.NEWNYM)
         return "Success"
+    ```
 
 8. Start the application:
     ```bash
