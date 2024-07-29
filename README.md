@@ -42,10 +42,12 @@ The Anonymous TOR Browser is a privacy-focused web browser designed to route all
     Replace `YOUR_PASSWORD` with a password name of your choice. Copy the hashed password that is generated
 
 6. Create and update the `torrc` file with the hashed password:
+    ```plaintext
     ControlPort 9051
     HashedControlPassword 16:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     SocksPort 9050
     CookieAuthentication 1
+    ```
 
     Replace 16:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX with the hashed password you generated. Save this content into a file named torrc in the project directory
 
