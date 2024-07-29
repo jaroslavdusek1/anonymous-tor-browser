@@ -1,6 +1,6 @@
 # Anonymous TOR Browser
 
-The Anonymous TOR Browser is a privacy-focused web browser designed to route all internet traffic through the TOR network, ensuring enhanced anonymity and security. TOR circuits is changed each 10 second in order to ensure maximal privacy.
+The Anonymous TOR Browser is a privacy-focused web browser designed to route all internet traffic through the TOR network, ensuring enhanced anonymity and security. TOR circuits change every 10 seconds to maximize privacy.
 
 ## Key Features
 
@@ -34,11 +34,34 @@ The Anonymous TOR Browser is a privacy-focused web browser designed to route all
     pip install -r requirements.txt
     ```
 
-5. Start the application:
+5. Generate the TOR hashed password and update the `torrc` file:
     ```bash
+    tor --hash-password [YOUR_PASSWORD]
+    ```
+
+    Replace `YOUR_PASSWORD` with a password name of your choice. Copy the hashed password that is generated
+
+6. Create and update the `torrc` file with the hashed password:
+    ControlPort 9051
+    HashedControlPassword 16:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    SocksPort 9050
+    CookieAuthentication 1
+
+    Replace 16:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX with the hashed password you generated. Save this content into a file named torrc in the project directory
+
+7. Update the Python script change_circuit.py with your chosen password:
+    def change_tor_circuit():
+    with Controller.from_port(port=9051) as controller:
+        controller.authenticate(password='[YOUR_PASSWORD_NAME]')
+        controller.signal(Signal.NEWNYM)
+        return "Success"
+
+8. Start the application:
+    ```bash
+    npm install
     npm start
     ```
 
 ## Usage
 
-After starting the application, the browser will open. You can enter URLs and navigate the web with all traffic routed through the TOR network.
+After starting the application, the browser will open, you can enter URLs and navigate the web with all traffic routed through the TOR network
